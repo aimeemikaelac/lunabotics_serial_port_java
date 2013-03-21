@@ -26,7 +26,7 @@ public class SerialTest extends Thread implements SerialPortEventListener {
 	private static final String PORT_NAMES[] = { 
 			"/dev/tty.usbserial-A9007UX1", // Mac OS X
 			"/dev/ttyUSB0", // Linux
-			"COM3", // Windows
+			"COM6", // Windows
 	};
 	/**
 	* A BufferedReader which will be fed by a InputStreamReader 
@@ -126,19 +126,32 @@ public class SerialTest extends Thread implements SerialPortEventListener {
 				int numBytes = receivedInputStream.available();
 				System.out.println("Received data on: "+ port);
 //				for(int i=0; i<numBytes; i++) {
+				if(numBytes>0) {
+					System.out.println("bytes to read: "+numBytes);
 					byte currentBytes[]=new byte[numBytes];
 					receivedInputStream.read(currentBytes);
-					//Integer intVal = new Integer(currentByte);
-					String received = new String(currentBytes, "US-ASCII");
-					Integer intVal = Integer.parseInt(received.toString());
-					char message = (char) intVal.intValue();
-					output.write(message);
-					String stringVal = String.valueOf(message);
-					if(stringVal == "\n") {
-						stringVal = "NULL";
+					for(int i = 0; i<currentBytes.length; i++) {
+						char current = (char) currentBytes[i];
+						if(current != '\0') {
+							output.write(current);
+						}
+						String stringVal = String.valueOf(current);
+						if(stringVal == "\n") {
+							stringVal = "NULL";
+						}
+						System.out.println("Read byte with value: " + stringVal);
 					}
-					System.out.println("Read byte with value: " + stringVal);//+ Integer.toBinaryString(currentByte));
+					
+					//Integer intVal = new Integer(currentByte);
+//					String received = new String(bytes2, "US-ASCII");
+					
+					//received = received + '\0';
+//					Integer intVal = Integer.parseInt(received.toString());
+//					char message = (char) intVal.intValue();
+//					output.write(message);
+					//+ Integer.toBinaryString(currentByte));
 //				}
+				}
 				servSocket.close();
 				connectedSocket.close();
 			}
