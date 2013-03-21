@@ -125,16 +125,20 @@ public class SerialTest extends Thread implements SerialPortEventListener {
 				InputStream receivedInputStream=connectedSocket.getInputStream();
 				int numBytes = receivedInputStream.available();
 				System.out.println("Received data on: "+ port);
-				for(int i=0; i<numBytes; i++) {
-					char currentByte=(char) receivedInputStream.read();
+//				for(int i=0; i<numBytes; i++) {
+					byte currentBytes[]=new byte[numBytes];
+					receivedInputStream.read(currentBytes);
 					//Integer intVal = new Integer(currentByte);
-					output.write(currentByte);
-					String stringVal = String.valueOf(currentByte);
-					if(currentByte == '\n') {
+					String received = new String(currentBytes, "US-ASCII");
+					Integer intVal = Integer.parseInt(received.toString());
+					char message = (char) intVal.intValue();
+					output.write(message);
+					String stringVal = String.valueOf(message);
+					if(stringVal == "\n") {
 						stringVal = "NULL";
 					}
 					System.out.println("Read byte with value: " + stringVal);//+ Integer.toBinaryString(currentByte));
-				}
+//				}
 				servSocket.close();
 				connectedSocket.close();
 			}
