@@ -149,7 +149,7 @@ public class SerialTest extends Thread implements SerialPortEventListener {
 	}
 
 	public static void main(String[] args) throws Exception {
-		SerialTest main = new SerialTest(2000);
+		SerialTest main = new SerialTest(2500);
 		main.initialize();
 		
 		main.start();
