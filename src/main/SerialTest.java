@@ -130,7 +130,7 @@ public class SerialTest extends Thread implements SerialPortEventListener {
 					System.out.println("bytes to read: "+numBytes);
 					byte currentBytes[]=new byte[numBytes];
 					receivedInputStream.read(currentBytes);
-					for(int i = 0; i<currentBytes.length; i++) {
+					for(int i = 0; i<currentBytes.length-1; i++) {
 						char current = (char) currentBytes[i];
 						if(current != '\0') {
 							output.write(current);
