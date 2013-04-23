@@ -27,7 +27,7 @@ public class USBCommunicator extends Thread implements SerialPortEventListener {
 	private String PORT_NAMES[] = { 
 			"/dev/tty.usbserial-A9007UX1", // Mac OS X
 			"/dev/ttyUSB0", // Linux
-			"COM3", // Windows
+			"COM6", // Windows
 	};
 	public USBCommunicator(String comPort) {
 		if(comPort.compareTo("COM3") != 0) {
@@ -154,6 +154,7 @@ public class USBCommunicator extends Thread implements SerialPortEventListener {
 //				int numBytes = receivedInputStream.available();
 //				System.out.println("Received data on: "+ port);
 //				for(int i=0; i<numBytes; i++) {
+<<<<<<< HEAD:src/main/USBCommunicator.java
 //					byte currentBytes[]=new byte[numBytes];
 //					receivedInputStream.read(currentBytes);
 					//Integer intVal = new Integer(currentByte);
