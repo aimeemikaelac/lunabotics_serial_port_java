@@ -9,25 +9,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Enumeration;
 
 
-public class SerialTest extends Thread implements SerialPortEventListener {
+public class USBCommunicator extends Thread implements SerialPortEventListener {
 	private SerialPort serialPort;
-	private int port;
+//	private int port;
 	
-	public SerialTest(int port) {
-		this.port = port;
-	}
+//	public USBCommunicator(int port) {
+//		this.port = port;
+//	}
 	
         /** The port we're normally going to use. */
-	private static final String PORT_NAMES[] = { 
+	private String PORT_NAMES[] = { 
 			"/dev/tty.usbserial-A9007UX1", // Mac OS X
 			"/dev/ttyUSB0", // Linux
 			"COM3", // Windows
 	};
+	public USBCommunicator(String comPort) {
+		if(comPort.compareTo("COM3") != 0) {
+			PORT_NAMES[2] = comPort;
+		}
+	}
+	
+	
 	/**
 	* A BufferedReader which will be fed by a InputStreamReader 
 	* converting the bytes into characters 
@@ -36,8 +44,8 @@ public class SerialTest extends Thread implements SerialPortEventListener {
 	private BufferedReader input;
 	/** The output stream to the port */
 	private static OutputStream output;
-	protected static ServerSocket servSocket;
-	protected static Socket connectedSocket;
+//	protected static ServerSocket servSocket;
+//	protected static Socket connectedSocket;
 	/** Milliseconds to block while waiting for port open */
 	private static final int TIME_OUT = 2000;
 	/** Default bits per second for COM port. */
@@ -115,42 +123,65 @@ public class SerialTest extends Thread implements SerialPortEventListener {
 		// Ignore all the other eventTypes, but you should consider the other ones.
 	}
 	
-	public void run() {
+	public synchronized void writeBytes(byte[] bytes) {
+		String received;
 		try {
-			while(true) {
-				
-				servSocket = new ServerSocket(port);
-				System.out.println("created socket on port:" + port);
-				connectedSocket = servSocket.accept();
-				InputStream receivedInputStream=connectedSocket.getInputStream();
-				int numBytes = receivedInputStream.available();
-				System.out.println("Received data on: "+ port);
-//				for(int i=0; i<numBytes; i++) {
-					byte currentBytes[]=new byte[numBytes];
-					receivedInputStream.read(currentBytes);
-					//Integer intVal = new Integer(currentByte);
-					String received = new String(currentBytes, "US-ASCII");
-					Integer intVal = Integer.parseInt(received.toString());
-					char message = (char) intVal.intValue();
-					output.write(message);
-					String stringVal = String.valueOf(message);
-					if(stringVal == "\n") {
-						stringVal = "NULL";
-					}
-					System.out.println("Read byte with value: " + stringVal);//+ Integer.toBinaryString(currentByte));
-//				}
-				servSocket.close();
-				connectedSocket.close();
+			received = new String(bytes, "US-ASCII");
+			Integer intVal = Integer.parseInt(received.toString());
+			char message = (char) intVal.intValue();
+			output.write(message);
+			String stringVal = String.valueOf(message);
+			if(stringVal == "\n") {
+				stringVal = "NULL";
 			}
-		} catch (IOException e) {
-			System.out.println("Could not open ServerSocket on port" + port);
+			System.out.println("Read byte with value: " + stringVal);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void run() {
+//		try {
+//			while(true) {
+				
+//				servSocket = new ServerSocket(port);
+//				System.out.println("created socket on port:" + port);
+//				connectedSocket = servSocket.accept();
+//				InputStream receivedInputStream=connectedSocket.getInputStream();
+//				int numBytes = receivedInputStream.available();
+//				System.out.println("Received data on: "+ port);
+//				for(int i=0; i<numBytes; i++) {
+//					byte currentBytes[]=new byte[numBytes];
+//					receivedInputStream.read(currentBytes);
+					//Integer intVal = new Integer(currentByte);
+					//+ Integer.toBinaryString(currentByte));
+//				}
+//				servSocket.close();
+//				connectedSocket.close();
+//			}
+//		} catch (IOException e) {
+//			System.out.println("Could not open ServerSocket on port" + port);
+//			e.printStackTrace();
+//		}
+		initialize();
+		while(true) {
+			try {
+				synchronized(this) {
+					wait(50);
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
 	public static void main(String[] args) throws Exception {
-		SerialTest main = new SerialTest(2500);
-		main.initialize();
+		USBCommunicator main = new USBCommunicator("COM4");
+//		main.initialize();
 		
 		main.start();
 		System.out.println("Started");
